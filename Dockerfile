@@ -4,8 +4,8 @@ COPY . /opt
 WORKDIR /opt
 
 RUN npm config set registry https://registry.npmmirror.com \
-    npm install \
-    npm run build
+    && npm install \
+    && npm run build
 
 FROM nginx:1.21
 
