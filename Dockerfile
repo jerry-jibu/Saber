@@ -1,11 +1,15 @@
-FROM nginx:stable-alpine-perl
+FROM node:12 as build
 
-RUN rm -f /etc/nginx/nginx.conf \
-    && rm -f /etc/nginx/conf.d/default.conf
-COPY docker/nginx.k8s.conf /etc/nginx/nginx.conf
+COPY . /opt
+WORKDIR /opt
 
-EXPOSE 80
+RUN npm config set registry https://registry.npmmirror.com \
+    npm install \
+    npm run build
 
-COPY ./dist /usr/share/nginx/html
+FROM nginx:1.21
 
-ENTRYPOINT ["nginx", "-g", "daemon off;"]
+COPY docker/nginx.k8s.conf /etc/nginx/conf.d/default.conf
+
+COPY --from=build /opt/dist /opt/dist
+
